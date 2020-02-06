@@ -11,15 +11,16 @@ const reg = /(.*)【(.*)】|(.*)【(.*)/;
 app.get('/api/live', function (req, res) {
     const roomId = parseInt(req.query.roomId);
     const status = parseInt(req.query.status);
+    const filename = req.query.filename;
     console.log(roomId + ': ' + status);
-    watch({roomId, status});
+    watch({roomId, status, filename});
     res.send({'msg': 1});
 });
 app.listen(config.ExpressPort, function () {
     console.log(`listening on port ${config.ExpressPort}!`);
 });
-const watch = ({roomId, status}) => {
-    let live = new LiveEvent(roomId);
+const watch = ({roomId, status, filename}) => {
+    let live = new LiveEvent(roomId, filename);
     currentLive[roomId] = status;
     if (status) {
         live.emit('start');
@@ -27,10 +28,10 @@ const watch = ({roomId, status}) => {
 };
 
 class LiveEvent extends EventEmitter {
-    constructor(roomId) {
+    constructor(roomId, filename) {
         super();
         this.roomId = roomId;
-        this.path = `${config.DownloadDir}/${this.roomId}_${Date.now()}.txt`;
+        this.path = `${config.DownloadDir}/${filename}`;
         this.live = new KeepLiveTCP(roomId);
         this.watch();
         this.on('start', () => {

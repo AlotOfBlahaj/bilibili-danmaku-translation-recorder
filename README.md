@@ -22,6 +22,7 @@ Bilibili-danmaku-translation-recorder
     
     调用方式
     
-        GET localhost:3000/api/live?roomId={roomId}&status={status}
+        GET localhost:3000/api/live?roomId={roomId}&status={status}&filename={filename}
         roomId 直播间号
         status 状态（1 表示开始记录 2 表示停止记录）
+        filename 记录文件名

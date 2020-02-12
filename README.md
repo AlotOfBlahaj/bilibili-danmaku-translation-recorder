@@ -24,4 +24,4 @@ Bilibili-danmaku-translation-recorder
     
         GET localhost:3000/api/live?roomId={roomId}&status={status}
         roomId 直播间号
-        status 状态（1 表示开始记录 2 表示停止记录）
+        status 状态（1 表示开始记录 0 表示停止记录）

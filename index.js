@@ -17,7 +17,7 @@ app.listen(config.ExpressPort, function () {
     console.log(`listening on port ${config.ExpressPort}!`);
 });
 const watch = ({roomId, status}) => {
-    if (currentLive[roomId] == 0 && status == 1) {
+    if (!currentLive[roomId] && status == 1) {
         new LiveEvent(roomId).emit('start');
     }
     currentLive[roomId] = status;

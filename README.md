@@ -16,12 +16,21 @@ Bilibili-danmaku-translation-recorder
     
     ```json
      {"ExpressPort": 3000,
-      "DownloadDir": "D:"}
+      "DownloadDir": "D:",
+      "SRT": false,
+      "VTT": false}
     ```
-    ExpressPort为监听端口，DownloadDir为同传记录文件保存目录
+    ExpressPort为监听端口
+    
+    DownloadDir为同传记录文件保存目录
+    
+    SRT是否输出SRT字幕
+    
+    VTT是否输出VTT字幕
     
  - 调用方式
     
-        GET localhost:3000/api/live?roomId={roomId}&status={status}
+        GET localhost:3000/api/live?roomId={roomId}&status={status}&filename={filename}
         roomId 直播间号
         status 状态（1 表示开始记录 0 表示停止记录）
+        filename 记录文件名

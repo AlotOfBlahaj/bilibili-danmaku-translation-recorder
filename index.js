@@ -40,16 +40,18 @@ class LiveEvent extends EventEmitter {
 
         this.path = `${config.DownloadDir}/${filename}`;
         this.txtFile = fs.createWriteStream(this.path, {flags: 'a+'});
-        this.srtFile = fs.createWriteStream(this.path.split('.txt')[0] + '.srt', {flags: 'a+'});
-
+        if (config.SRT || config.VTT) this.srtFile = fs.createWriteStream(this.path.split('.txt')[0] + '.srt', {flags: 'a+'});
         this.watch();
         this.on('start', () => {
             this.monitor(this.roomId);
         });
         this.on('close', () => {
-            this.writeSubtitle(null);
-            this.writePlainText(null);
             this.live.close();
+            if (config.SRT || config.VTT) {
+                this.writeSubtitle(null);
+                this.writeVTT();
+            }
+            this.writePlainText(null);
         })
     }
 
@@ -96,6 +98,37 @@ class LiveEvent extends EventEmitter {
 
     }
 
+    srt2VTT(srt) {
+        srt = srt.replace(/\r+/g, '');
+        srt = srt.replace(/^\s+|\s+$/g, '');
+        let cuelist = srt.split('\n');
+        let result = "";
+        if (cuelist.length > 0) {
+            result += "WEBVTT\n";
+            for (let i = 0; i < cuelist.length; i += 3) {
+                // result += cuelist[i] + "\n";
+                result += cuelist[i + 1] + "\n";
+                result += `- ${cuelist[i + 2]}\n`
+            }
+        }
+        return result;
+    }
+
+    async writeVTT() {
+        let vtt = "";
+        await fs.readFile(this.path.split('.txt')[0] + '.srt', 'UTF-8', (err, data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                vtt = this.srt2VTT(data);
+                if (!vtt) return;
+                let f = fs.createWriteStream(this.path.split('.txt')[0] + '.vtt', {flags: 'a+'});
+                f.write(vtt);
+                f.close();
+            }
+        });
+    }
+
     monitor() {
         this.live.on('open', () => console.log(this.roomId + 'Connection is established'));
         this.live.on('DANMU_MSG', (data) => {
@@ -104,7 +137,7 @@ class LiveEvent extends EventEmitter {
             let s = this.danmakuFilter(danmakuText);
             if (s) {
                 this.writePlainText(s);
-                this.writeSubtitle(s);
+                if (config.VTT || config.SRT) this.writeSubtitle(s);
             }
         });
     };
@@ -112,7 +145,8 @@ class LiveEvent extends EventEmitter {
     watch() {
         const _watch = () => {
             if (currentLive[this.roomId] === 0) {
-                this.emit('close')
+                this.emit('close');
+                return
             } else {
                 console.log(`KeepAlive ${this.roomId}`)
             }

@@ -16,9 +16,17 @@ Bilibili-danmaku-translation-recorder
     
     ```json
      {"ExpressPort": 3000,
-      "DownloadDir": "D:"}
+      "DownloadDir": "D:",
+      "SRT": false,
+      "VTT": false}
     ```
-    ExpressPort为监听端口，DownloadDir为同传记录文件保存目录
+    ExpressPort为监听端口
+    
+    DownloadDir为同传记录文件保存目录
+    
+    SRT是否输出SRT字幕
+    
+    VTT是否输出VTT字幕
     
  - 调用方式
     

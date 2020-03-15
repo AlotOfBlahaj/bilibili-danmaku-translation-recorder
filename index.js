@@ -7,13 +7,15 @@ const config = require('./config');
 let currentLive = new Map();
 
 app.get('/api/live', function (req, res) {
-    const roomId = parseInt(req.query.roomId);
+    const roomId = parseInt(req.query.roomID);
     const status = parseInt(req.query.status);
     const filename = req.query.filename;
     if (roomId && filename) {
         console.log(roomId + ': ' + status);
         watch({roomId, status, filename});
         res.send({'msg': 1});
+    } else {
+        res.send({'msg': 0})
     }
 });
 app.listen(config.ExpressPort, function () {
